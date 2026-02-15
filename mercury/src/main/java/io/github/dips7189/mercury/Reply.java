@@ -30,6 +30,10 @@ public final class Reply {
     this.raw = raw;
   }
 
+  /**
+   * Return the HTTP status code.
+   * @return The HTTP status code.
+   */
   public int status() {
     return raw.statusCode();
   }
@@ -38,6 +42,11 @@ public final class Reply {
     return raw.uri();
   }
 
+  /**
+   * Returns an unmodifiable multi Map view of this HttpHeaders.
+   *
+   * @return The Map.
+   */
   public Map<String, List<String>> headers() {
     return raw.headers().map();
   }
@@ -54,10 +63,23 @@ public final class Reply {
     return raw.headers().firstValue(name);
   }
 
+  /**
+   * Returns an unmodifiable List of all of the header string values of the
+   * given named header. Always returns a List, which may be empty if the
+   * header is not present.
+   *
+   * @param name the header name
+   * @return a List of headers string values
+   */
   public List<String> headers(String name) {
     return raw.headers().allValues(name);
   }
 
+  /**
+   * Returns whether the HTTP Status is a success status or not.
+   *
+   * @return whether the status is successful.
+   */
   public boolean ok() {
     return status() >= 200 && status() < 300;
   }

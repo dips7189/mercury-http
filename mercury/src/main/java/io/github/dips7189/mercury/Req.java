@@ -11,9 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Mutable request builder used internally by Mercury.
+ *
+ * <p>Accumulates headers, timeout, and body before producing an {@link java.net.http.HttpRequest}.</p>
+ */
 public final class Req {
   private final String method;
   private final URI uri;
+  private boolean repeatableBody = true;
 
   private Duration timeout;
   private final Map<String, List<String>> headers = new LinkedHashMap<>();
@@ -28,6 +34,15 @@ public final class Req {
   public Req timeout(Duration d) {
     this.timeout = d;
     return this;
+  }
+
+  /**
+   * Returns whether the body in this request is repeatable or not.
+   *
+   * @return whether the body is repeatable or not repeatable.
+   */
+  public boolean isRepeatableBody() {
+    return repeatableBody;
   }
 
   public Req header(String name, String value) {
@@ -101,6 +116,7 @@ public final class Req {
   }
 
   public Req bodyString(String s) {
+    this.repeatableBody = true;
     return bodyString(s, StandardCharsets.UTF_8);
   }
 
@@ -112,6 +128,7 @@ public final class Req {
   }
 
   public Req bodyBytes(byte[] bytes) {
+    this.repeatableBody = true;
     Objects.requireNonNull(bytes, "body");
     this.bodyPublisher = HttpRequest.BodyPublishers.ofByteArray(bytes);
     return this;
@@ -119,6 +136,7 @@ public final class Req {
 
   public Req body(HttpRequest.BodyPublisher publisher) {
     this.bodyPublisher = Objects.requireNonNull(publisher, "publisher");
+    this.repeatableBody = false; // unknown body is assumed to be non-replayable
     return this;
   }
 
